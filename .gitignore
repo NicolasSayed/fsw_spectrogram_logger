@@ -1,0 +1,11 @@
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.venv*/
+*.pdf
+*.dat
+*.log
+*.lock
+*.reserve
+logs/
+test-output/
