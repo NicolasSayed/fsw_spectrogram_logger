@@ -5,6 +5,37 @@ Windows computer and periodically saves its existing spectrogram history as
 numerical ASCII files. No external PC, Python installation, VISA, third-party
 modules, zero-span mode or continuous raw I/Q transfer is needed.
 
+## Short, simple version
+
+[fsw_spectrogram_simple.ps1](fsw_spectrogram_simple.ps1) is about 75 lines of plain
+PowerShell, with no embedded C#. Configure your Spectrum/spectrogram display first,
+then run it **on the instrument**:
+
+```powershell
+# Test one export (replace 2 with your spectrogram window's actual index)
+.\fsw_spectrogram_simple.ps1 -Window 2 -RunOnce
+
+# Keep saving history snapshots, every 10 seconds
+.\fsw_spectrogram_simple.ps1 -Window 2 -IntervalSeconds 10 -Folder 'C:\FSW_Logs'
+```
+
+It identifies the FSW, checks the window type and positive span, enables display
+updates, saves numerical history with unique UTC filenames, waits for completion,
+checks one SCPI error entry and a nonempty file, and writes a simple success log.
+It **never clears history**. Exports run sequentially; overrun intervals are
+skipped. Press Ctrl+C to stop; a query wait may delay this until `-TimeoutSeconds`
+(default 120) expires. The socket is closed on exit and display restoration is
+attempted when the connection is usable and no export remains unconfirmed.
+
+The simple script stops on the first error. It has no reconnects, storage caps,
+folder locking, channel-change monitoring or full export-format validation.
+Run only one logger/controller at a time and use a known working setup. Use the
+full logger below for unattended operation with those checks and retry behavior.
+Both versions save overlapping history snapshots, with possible gaps, and neither
+has been validated on physical FSW hardware yet.
+
+## Full logger
+
 This is a **history snapshot logger**, not a gapless recorder. It leaves frequency,
 span, RBW, trace selection, acquisition and history depth as configured in the FSW
 UI. Default operation preserves history. The only default setting change enables
@@ -261,7 +292,7 @@ The implementation was checked against the supplied **FSW User Manual,
 1173.9411.02, version 57**, applicable to firmware 6.40 and later. See
 [manual evidence](docs/manual_evidence.md) for pages, hash, inspection tools and
 the distinction between documented behavior, mock verification and pending
-instrument verification. **39 tests passed without skips**; the executed checks
+instrument verification. **50 tests passed without skips**; the executed checks
 and a real mock-run excerpt are recorded in [validation](docs/validation.md).
 The exact model/firmware and localhost binding remain
 to be checked with `-ListWindows` and `-RunOnce` on your FSW. No actual on-device

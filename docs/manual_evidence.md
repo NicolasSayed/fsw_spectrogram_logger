@@ -51,6 +51,11 @@ and after store, no ambiguous replay, unique names, folder exclusion, graceful
 stop flags and the serial monotonic schedule. The optional Python inspector uses
 only independent synthetic exports.
 
+The optional `fsw_spectrogram_simple.ps1` uses the same documented SCPI commands
+in plain PowerShell without the embedded C# transport or streamed format parser.
+Its own mock tests check the short loop and failure behavior. It never clears
+history or retries an ambiguous operation, and verifies only a nonempty file.
+
 Mock success proves implementation behavior against the mock contract. It does
 **not** prove real FSW command availability, file layout on every firmware,
 acquisition continuity, USB behavior, physical Ctrl+C delivery by every console
