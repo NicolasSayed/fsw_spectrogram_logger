@@ -5,8 +5,8 @@
 - **Windows PowerShell 5.1.26100.9711**: parsed the complete `.ps1` with the native
   PowerShell parser, then compiled and executed its embedded C# using `Add-Type`.
 - **Python 3.11 standard-library unittest**:
-  `py -3.11 -m unittest discover -s tests -v` — **50 tests passed, 0 skipped**.
-  33 cover the full PowerShell logger, 11 execute the short PowerShell script,
+  `py -3.11 -m unittest discover -s tests -v` — **51 tests passed, 0 skipped**.
+  33 cover the full PowerShell logger, 12 execute the short PowerShell script,
   and 6 exercise the optional workstation inspector.
 - A separate actual full-logger `-Window 2 -RunOnce` execution against the mock produced a
   321-byte numerical spectrogram, validated its two frames and three points per
@@ -44,8 +44,10 @@ The inspector tests cover exact raw timestamps, two AUTOPEAK columns, unchanged
 files, candidate overlaps, timestamp collisions with different values, incomplete
 input, the bounded candidate index and no-overwrite JSON output.
 
-The short-script tests verify one-shot and repeated saves, unique paths, history
-preservation, display restoration, wrong-window/zero-span rejection, missing/empty
+The short-script tests verify one-shot and repeated saves, numbered run folders,
+preservation of existing folders (including empty ones) and files, unique paths,
+one folder per launch, history preservation, display restoration,
+wrong-window/zero-span rejection, missing/empty
 files, actual SCPI errors, connection drops and timeouts without replay, skipped
 intervals, and refusing to echo an invalid display setting back to the instrument.
 It deliberately checks only a nonempty export, not the full numerical layout,

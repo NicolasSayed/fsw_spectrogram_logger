@@ -32,7 +32,9 @@ class SimpleTests(unittest.TestCase):
             self.assertEqual(fake.paths[0].read_bytes(), SAMPLE)
             self.assertEqual(fake.clear_count, 0)
             self.assertEqual(fake.display, "0")
-            log = next(self.folder.glob("simple_*.log"))
+            self.assertEqual(fake.paths[0].parent, self.folder / "run1")
+            self.assertIn(str(self.folder / "run1"), output)
+            log = next(fake.paths[0].parent.glob("simple_*.log"))
             self.assertIn("bytes,", log.read_text(encoding="utf-8-sig"))
             self.assertFalse(any(c.startswith(("*RST","INIT","CALC")) for c in fake.commands))
 
@@ -75,7 +77,22 @@ class SimpleTests(unittest.TestCase):
         with instrument() as fake:
             self.run_script(fake,"-RunOnce"); self.run_script(fake,"-RunOnce")
             self.assertEqual(len(set(fake.paths)),2)
+            self.assertEqual([p.parent for p in fake.paths],
+                             [self.folder / "run1", self.folder / "run2"])
             self.assertTrue(all(p.read_bytes()==SAMPLE for p in fake.paths))
+
+    def test_existing_folders_and_files_are_skipped_and_preserved(self):
+        (self.folder / "run1").mkdir()  # Even an empty run must not be reused.
+        (self.folder / "run2").write_bytes(b"existing file")
+        (self.folder / "run3").mkdir()
+        old_data = self.folder / "run3" / "measurement.dat"
+        old_data.write_bytes(b"existing measurement")
+        with instrument() as fake:
+            self.run_script(fake,"-RunOnce")
+            self.assertEqual(fake.paths[0].parent, self.folder / "run4")
+        self.assertEqual(list((self.folder / "run1").iterdir()), [])
+        self.assertEqual((self.folder / "run2").read_bytes(), b"existing file")
+        self.assertEqual(old_data.read_bytes(), b"existing measurement")
 
     def test_invalid_display_setting_is_never_sent_back(self):
         with instrument() as fake:
@@ -108,6 +125,7 @@ class SimpleTests(unittest.TestCase):
             output = self.run_script(fake,expected=1)
             self.assertIn("Export overrun", output)
             self.assertEqual(len(fake.paths),3)
+            self.assertTrue(all(p.parent == self.folder / "run1" for p in fake.paths))
             self.assertEqual(sum(p.exists() for p in fake.paths),2)
             self.assertEqual(fake.clear_count,0)
 

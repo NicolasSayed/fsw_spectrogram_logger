@@ -7,7 +7,7 @@ modules, zero-span mode or continuous raw I/Q transfer is needed.
 
 ## Short, simple version
 
-[fsw_spectrogram_simple.ps1](fsw_spectrogram_simple.ps1) is about 75 lines of plain
+[fsw_spectrogram_simple.ps1](fsw_spectrogram_simple.ps1) is about 80 lines of plain
 PowerShell, with no embedded C#. Configure your Spectrum/spectrogram display first,
 then run it **on the instrument**:
 
@@ -18,6 +18,12 @@ then run it **on the instrument**:
 # Keep saving history snapshots, every 10 seconds
 .\fsw_spectrogram_simple.ps1 -Window 2 -IntervalSeconds 10 -Folder 'C:\FSW_Logs'
 ```
+
+Edit `$Folder = 'C:\FSW_Logs'` near the top to choose where to save, or override
+it with `-Folder` as above. Each launch creates the first available numbered
+subfolder: `C:\FSW_Logs\run1`, then `run2`, `run3`, and so on. Existing folders
+(even empty ones) and files are skipped and preserved. All snapshots and the log
+for that launch go into its new run folder; the console prints the chosen path.
 
 It identifies the FSW, checks the window type and positive span, enables display
 updates, saves numerical history with unique UTC filenames, waits for completion,
@@ -292,7 +298,7 @@ The implementation was checked against the supplied **FSW User Manual,
 1173.9411.02, version 57**, applicable to firmware 6.40 and later. See
 [manual evidence](docs/manual_evidence.md) for pages, hash, inspection tools and
 the distinction between documented behavior, mock verification and pending
-instrument verification. **50 tests passed without skips**; the executed checks
+instrument verification. **51 tests passed without skips**; the executed checks
 and a real mock-run excerpt are recorded in [validation](docs/validation.md).
 The exact model/firmware and localhost binding remain
 to be checked with `-ListWindows` and `-RunOnce` on your FSW. No actual on-device

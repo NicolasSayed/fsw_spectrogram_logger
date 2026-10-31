@@ -3,7 +3,7 @@
 param(
     [ValidateRange(1,16)][int]$Window = 2,
     [ValidateRange(0.1,86400)][double]$IntervalSeconds = 10,
-    [string]$Folder = 'C:\FSW_Logs',
+    [string]$Folder = 'C:\FSW_Logs',  # EDIT THIS: parent folder for run1, run2, ...
     [string]$HostName = '127.0.0.1', [ValidateRange(1,65535)][int]$Port = 5025,
     [ValidateRange(0.1,3600)][double]$TimeoutSeconds = 120,
     [switch]$RunOnce
@@ -14,6 +14,11 @@ if ($Folder -notmatch '^[A-Za-z]:[\\/]' -or $Folder -match '[^\x20-\x7e]|[''";]'
 }
 $Folder = [IO.Path]::GetFullPath($Folder)
 [IO.Directory]::CreateDirectory($Folder) | Out-Null
+$run = 1
+while (Test-Path -LiteralPath (Join-Path $Folder "run$run")) { $run++ }
+$Folder = Join-Path $Folder "run$run"
+New-Item -ItemType Directory -Path $Folder | Out-Null
+Write-Host "Output folder: $Folder"
 $log = Join-Path $Folder ('simple_' + [guid]::NewGuid().ToString('N') + '.log')
 $client = [Net.Sockets.TcpClient]::new()
 $display = $null; $pending = $false; $writer = $null; $script:usable = $true
